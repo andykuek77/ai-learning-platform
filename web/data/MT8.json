@@ -1,0 +1,146 @@
+[
+  {
+    "id": 1,
+    "type": "mcq",
+    "question": "Four consecutive page numbers in a book add up to 346. What is the smallest page number?",
+    "options": [
+      "84",
+      "86",
+      "85",
+      "87"
+    ],
+    "marks": 2
+  },
+  {
+    "id": 2,
+    "type": "mcq",
+    "question": "A delivery van carries 9 boxes. Each box contains 8 packets, and each packet contains 6 markers. If\n27 markers are given away, how many markers remain?",
+    "options": [
+      "459",
+      "378",
+      "405",
+      "432"
+    ],
+    "marks": 2
+  },
+  {
+    "id": 3,
+    "type": "mcq",
+    "question": "Two parcels have a total mass of 8 kg 450 g. The heavier parcel is 1 kg 250 g heavier than the lighter\nparcel. If 750 g is removed from the heavier parcel, what is its new mass?",
+    "options": [
+      "3 kg 850 g",
+      "4 kg 100 g",
+      "4 kg 850 g",
+      "5 kg 600 g"
+    ],
+    "marks": 2
+  },
+  {
+    "id": 4,
+    "type": "mcq",
+    "question": "A square and a rectangle have the same perimeter. The square has side 14 cm. The rectangle is 18\ncm long. What is the breadth of the rectangle?",
+    "options": [
+      "20 cm",
+      "10 cm",
+      "8 cm",
+      "12 cm"
+    ],
+    "marks": 2
+  },
+  {
+    "id": 5,
+    "type": "mcq",
+    "question": "A train journey takes 2 h 45 min. The train arrives at 12.20 a.m. on Tuesday. At what time did it leave\non Monday?",
+    "options": [
+      "9.35 p.m.",
+      "8.35 p.m.",
+      "10.35 p.m.",
+      "9.25 p.m."
+    ],
+    "marks": 2
+  },
+  {
+    "id": 6,
+    "type": "mcq",
+    "question": "Nora bought 4 identical notebooks and 1 pen. The pen cost $6. She paid with a $50 note and received\n$8 change. How much did each notebook cost?",
+    "options": [
+      "$7",
+      "$8",
+      "$10",
+      "$9"
+    ],
+    "marks": 2
+  },
+  {
+    "id": 7,
+    "type": "mcq",
+    "question": "A box contains red, blue and green counters. 2/7 of the counters are red and 3/7 are blue. There are\n12 more blue counters than red counters. How many green counters are there?",
+    "options": [
+      "24",
+      "18",
+      "30",
+      "36"
+    ],
+    "marks": 2
+  },
+  {
+    "id": 8,
+    "type": "mcq",
+    "question": "A rectangle is 5 cm longer than it is wide. Its perimeter is 54 cm. What is its length?",
+    "options": [
+      "11 cm",
+      "22 cm",
+      "27 cm",
+      "16 cm"
+    ],
+    "marks": 2
+  },
+  {
+    "id": 9,
+    "type": "mcq",
+    "question": "Study the pattern: 640, 611, 579, 544, 506, ____. What is the missing number?",
+    "options": [
+      "471",
+      "462",
+      "468",
+      "465"
+    ],
+    "marks": 2
+  },
+  {
+    "id": 10,
+    "type": "mcq",
+    "question": "Cards are arranged repeatedly in this pattern: A, B, C, D, D, C, B, A. The pattern continues in the same\nway. How many B cards are there among the first 123 cards?",
+    "options": [
+      "29",
+      "31",
+      "30",
+      "32"
+    ],
+    "marks": 2
+  },
+  {
+    "id": 11,
+    "type": "mcq",
+    "question": "There are 28 children. 16 chose milk, 15 chose juice and 6 chose both. How many chose exactly one\nof the two drinks?",
+    "options": [
+      "13",
+      "25",
+      "19",
+      "31"
+    ],
+    "marks": 2
+  },
+  {
+    "id": 12,
+    "type": "mcq",
+    "question": "Maya had 96 more stickers than Noah. They each gave away 18 stickers. After that, Maya had 4 times\nas many stickers as Noah. How many stickers did Maya have at first?",
+    "options": [
+      "146",
+      "128",
+      "138",
+      "164"
+    ],
+    "marks": 2
+  }
+]

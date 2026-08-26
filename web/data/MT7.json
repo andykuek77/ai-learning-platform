@@ -1,0 +1,170 @@
+[
+  {
+    "id": 1,
+    "type": "mcq",
+    "question": "A shop had some notebooks. It sold 248 notebooks in the morning. In the afternoon, it sold 87 more\nnotebooks than in the morning. At the end of the day, 196 notebooks were left. How many notebooks\ndid the shop have at first?",
+    "options": [
+      "692",
+      "866",
+      "779",
+      "1027"
+    ],
+    "marks": 2,
+    "correctOption": 3,
+    "correctAnswer": "779"
+  },
+  {
+    "id": 2,
+    "type": "mcq",
+    "question": "A baker made some muffins. He packed 6 muffins into each box and had 5 muffins left over. If he had\nmade 13 more muffins, he could have packed all the muffins equally into 25 boxes, with no muffins\nleft over. How many muffins did the baker make at first?",
+    "options": [
+      "132",
+      "142",
+      "147",
+      "137"
+    ],
+    "marks": 2,
+    "correctOption": 4,
+    "correctAnswer": "137"
+  },
+  {
+    "id": 3,
+    "type": "mcq",
+    "question": "Two ribbons had a total length of 9 m. The red ribbon was 1 m 80 cm longer than the blue ribbon.\nAfter 60 cm was cut from each ribbon, what was the length of the red ribbon?",
+    "options": [
+      "4 m 80 cm",
+      "4 m 20 cm",
+      "4 m 90 cm",
+      "5 m 40 cm"
+    ],
+    "marks": 2,
+    "correctOption": 1,
+    "correctAnswer": "4 m 80 cm"
+  },
+  {
+    "id": 4,
+    "type": "mcq",
+    "question": "A rectangular notice board is 24 cm long and 15 cm wide. A square card of side 6 cm is placed at one\ncorner. What is the perimeter of the notice board?",
+    "options": [
+      "39 cm",
+      "72 cm",
+      "78 cm",
+      "84 cm"
+    ],
+    "marks": 2,
+    "correctOption": 3,
+    "correctAnswer": "78 cm"
+  },
+  {
+    "id": 5,
+    "type": "mcq",
+    "question": "A school bus leaves at 7.48 a.m. It reaches the museum 1 h 37 min later. The pupils spend 25 min\nhaving a snack before entering. At what time do they enter the museum?",
+    "options": [
+      "9.50 a.m.",
+      "9.25 a.m.",
+      "9.40 a.m.",
+      "10.00 a.m."
+    ],
+    "marks": 2,
+    "correctOption": 1,
+    "correctAnswer": "9.50 a.m."
+  },
+  {
+    "id": 6,
+    "type": "mcq",
+    "question": "A fruit stall sells 3 mangoes for $8 or 1 mango for $3. What is the least amount needed to buy exactly\n11 mangoes?",
+    "options": [
+      "$29",
+      "$31",
+      "$32",
+      "$30"
+    ],
+    "marks": 2,
+    "correctOption": 4,
+    "correctAnswer": "$30"
+  },
+  {
+    "id": 7,
+    "type": "mcq",
+    "question": "A jug contains 3 l 600 ml of juice. The juice is poured equally into 8 bottles. How much juice is in 5\nbottles?",
+    "options": [
+      "2 l 050 ml",
+      "2 l 250 ml",
+      "2 l 150 ml",
+      "2 l 350 ml"
+    ],
+    "marks": 2,
+    "correctOption": 2,
+    "correctAnswer": "2 l 250 ml"
+  },
+  {
+    "id": 8,
+    "type": "mcq",
+    "question": "Which fraction is greater than 1/3 but less than 3/4?",
+    "options": [
+      "1/4",
+      "4/5",
+      "2/5",
+      "5/6"
+    ],
+    "marks": 2,
+    "correctOption": 3,
+    "correctAnswer": "2/5"
+  },
+  {
+    "id": 9,
+    "type": "mcq",
+    "question": "Study the pattern: 17, 25, 36, 50, 67, ____. What is the missing number?",
+    "options": [
+      "84",
+      "86",
+      "89",
+      "87"
+    ],
+    "marks": 2,
+    "correctOption": 4,
+    "correctAnswer": "87"
+  },
+  {
+    "id": 10,
+    "type": "mcq",
+    "question": "A repeating border uses this pattern: triangle, circle, circle, square, star, triangle, circle, circle, square,\nstar, ... What is the 73rd shape?",
+    "options": [
+      "circle",
+      "triangle",
+      "square",
+      "star"
+    ],
+    "marks": 2,
+    "correctOption": 1,
+    "correctAnswer": "circle"
+  },
+  {
+    "id": 11,
+    "type": "mcq",
+    "question": "There are 32 pupils in a class. 19 joined Art Club, 17 joined Chess Club and 8 joined both clubs. How\nmany joined neither club?",
+    "options": [
+      "2",
+      "4",
+      "6",
+      "8"
+    ],
+    "marks": 2,
+    "correctOption": 2,
+    "correctAnswer": "4"
+  },
+  {
+    "id": 12,
+    "type": "mcq",
+    "question": "A game gives 4 points for a win and deducts 2 points for a loss. Amir played 18 games, won or lost\nevery game, and scored 48 points. How many games did he win?",
+    "options": [
+      "12",
+      "14",
+      "13",
+      "15"
+    ],
+    "marks": 2,
+    "correctOption": 2,
+    "correctAnswer": "14"
+  }
+]
