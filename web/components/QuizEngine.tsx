@@ -12,7 +12,13 @@ import { saveQuizAttempt } from "@/lib/quizAttempts";
 import { supabase } from "@/lib/supabase";
 import type { AnswerFeedback, Quiz, QuizAnswers } from "@/types/quiz";
 
-export default function QuizEngine({ quiz }: { quiz: Quiz }) {
+export default function QuizEngine({
+  quiz,
+  notice,
+}: {
+  quiz: Quiz;
+  notice?: string;
+}) {
   const router = useRouter();
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -148,6 +154,7 @@ export default function QuizEngine({ quiz }: { quiz: Quiz }) {
             </div>
             <div style={styles.counter}>{currentIndex + 1} / {quiz.questions.length}</div>
           </div>
+          {notice ? <div style={styles.notice}>{notice}</div> : null}
           <ProgressBar current={currentIndex + 1} total={quiz.questions.length} />
           <QuestionCard question={question} selectedOption={selectedOption} feedback={feedback} onSelect={(option) => { setSelectedOption(option); setFeedback(null); }} />
           <QuizControls isFirstQuestion={isFirstQuestion} isLastQuestion={isLastQuestion} hasSelection={selectedOption !== null} hasFeedback={feedback !== null} saving={saving} onPrevious={handlePrevious} onContinue={handleContinue} />
@@ -165,6 +172,7 @@ const styles: Record<string, React.CSSProperties> = {
   eyebrow: { margin: 0, fontSize: 12, fontWeight: 700, letterSpacing: "1.5px", color: "#888" },
   title: { margin: "7px 0 0", fontSize: 28, fontWeight: 600 },
   counter: { fontSize: 14, color: "#777" },
+  notice: { marginBottom: 18, padding: "12px 14px", borderRadius: 10, background: "#fff8e6", color: "#725c24", lineHeight: 1.5 },
   authLoading: {
     minHeight: "100vh",
     display: "flex",
