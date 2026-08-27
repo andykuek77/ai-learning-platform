@@ -11,7 +11,9 @@
     ],
     "marks": 2,
     "correctOption": 3,
-    "correctAnswer": "779"
+    "correctAnswer": "779",
+    "topic": "Whole Numbers",
+    "skill": "Multi-step addition and subtraction"
   },
   {
     "id": 2,
@@ -25,7 +27,9 @@
     ],
     "marks": 2,
     "correctOption": 4,
-    "correctAnswer": "137"
+    "correctAnswer": "137",
+    "topic": "Whole Numbers",
+    "skill": "Division with remainders"
   },
   {
     "id": 3,
@@ -39,7 +43,9 @@
     ],
     "marks": 2,
     "correctOption": 1,
-    "correctAnswer": "4 m 80 cm"
+    "correctAnswer": "4 m 80 cm",
+    "topic": "Measurement",
+    "skill": "Length problems"
   },
   {
     "id": 4,
@@ -53,7 +59,9 @@
     ],
     "marks": 2,
     "correctOption": 3,
-    "correctAnswer": "78 cm"
+    "correctAnswer": "78 cm",
+    "topic": "Geometry",
+    "skill": "Perimeter of rectangles and squares"
   },
   {
     "id": 5,
@@ -67,7 +75,9 @@
     ],
     "marks": 2,
     "correctOption": 1,
-    "correctAnswer": "9.50 a.m."
+    "correctAnswer": "9.50 a.m.",
+    "topic": "Measurement",
+    "skill": "Time and duration"
   },
   {
     "id": 6,
@@ -81,7 +91,9 @@
     ],
     "marks": 2,
     "correctOption": 4,
-    "correctAnswer": "$30"
+    "correctAnswer": "$30",
+    "topic": "Measurement",
+    "skill": "Money calculations"
   },
   {
     "id": 7,
@@ -95,7 +107,9 @@
     ],
     "marks": 2,
     "correctOption": 2,
-    "correctAnswer": "2 l 250 ml"
+    "correctAnswer": "2 l 250 ml",
+    "topic": "Measurement",
+    "skill": "Capacity problems"
   },
   {
     "id": 8,
@@ -109,7 +123,9 @@
     ],
     "marks": 2,
     "correctOption": 3,
-    "correctAnswer": "2/5"
+    "correctAnswer": "2/5",
+    "topic": "Fractions",
+    "skill": "Compare and order fractions"
   },
   {
     "id": 9,
@@ -123,7 +139,9 @@
     ],
     "marks": 2,
     "correctOption": 4,
-    "correctAnswer": "87"
+    "correctAnswer": "87",
+    "topic": "Patterns",
+    "skill": "Growing number patterns"
   },
   {
     "id": 10,
@@ -137,7 +155,9 @@
     ],
     "marks": 2,
     "correctOption": 1,
-    "correctAnswer": "circle"
+    "correctAnswer": "circle",
+    "topic": "Patterns",
+    "skill": "Repeating patterns"
   },
   {
     "id": 11,
@@ -151,7 +171,9 @@
     ],
     "marks": 2,
     "correctOption": 2,
-    "correctAnswer": "4"
+    "correctAnswer": "4",
+    "topic": "Data and Sets",
+    "skill": "Overlapping groups"
   },
   {
     "id": 12,
@@ -165,6 +187,8 @@
     ],
     "marks": 2,
     "correctOption": 2,
-    "correctAnswer": "14"
+    "correctAnswer": "14",
+    "topic": "Whole Numbers",
+    "skill": "Two-quantity problems"
   }
 ]

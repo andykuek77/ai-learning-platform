@@ -1,18 +1,36 @@
+import Link from "next/link";
+
 type AppHeaderProps = {
-  practiceActive?: boolean;
+  activeSection?: "practice" | "progress";
   userEmail: string;
 };
 
 export default function AppHeader({
-  practiceActive = false,
+  activeSection,
   userEmail,
 }: AppHeaderProps) {
   return (
     <header style={styles.header}>
       <div style={styles.brand}>LearnAI</div>
       <nav style={styles.nav}>
-        <span style={practiceActive ? styles.activeNav : undefined}>Practice</span>
-        <span>Progress</span>
+        <Link
+          href="/"
+          style={{
+            ...styles.navLink,
+            ...(activeSection === "practice" ? styles.activeNav : {}),
+          }}
+        >
+          Practice
+        </Link>
+        <Link
+          href="/progress"
+          style={{
+            ...styles.navLink,
+            ...(activeSection === "progress" ? styles.activeNav : {}),
+          }}
+        >
+          Progress
+        </Link>
         <span>Profile</span>
         <span style={styles.signedIn}>Signed in as {userEmail}</span>
       </nav>
@@ -32,6 +50,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   brand: { fontSize: 22, fontWeight: 700 },
   nav: { display: "flex", gap: 32, color: "#666", fontSize: 15 },
+  navLink: { color: "inherit", textDecoration: "none" },
   activeNav: { color: "#111", fontWeight: 600 },
   signedIn: { color: "#777", fontSize: 13 },
 };

@@ -139,7 +139,7 @@ export default function QuizEngine({ quiz }: { quiz: Quiz }) {
   return (
     <main style={styles.page}>
       <div style={styles.shell}>
-        <AppHeader practiceActive userEmail={userEmail} />
+        <AppHeader activeSection="practice" userEmail={userEmail} />
         <section style={styles.content}>
           <div style={styles.topRow}>
             <div>
