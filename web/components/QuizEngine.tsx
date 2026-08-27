@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import AppHeader from "@/components/AppHeader";
 import ProgressBar from "@/components/ProgressBar";
 import QuestionCard from "@/components/QuestionCard";
@@ -8,9 +9,12 @@ import QuizControls from "@/components/QuizControls";
 import ResultCard from "@/components/ResultCard";
 import { calculateScore, calculateTotalMarks } from "@/lib/quiz";
 import { saveQuizAttempt } from "@/lib/quizAttempts";
+import { supabase } from "@/lib/supabase";
 import type { AnswerFeedback, Quiz, QuizAnswers } from "@/types/quiz";
 
 export default function QuizEngine({ quiz }: { quiz: Quiz }) {
+  const router = useRouter();
+  const [userEmail, setUserEmail] = useState<string | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [answers, setAnswers] = useState<QuizAnswers>({});
@@ -22,6 +26,32 @@ export default function QuizEngine({ quiz }: { quiz: Quiz }) {
   const question = quiz.questions[currentIndex];
   const isFirstQuestion = currentIndex === 0;
   const isLastQuestion = currentIndex === quiz.questions.length - 1;
+
+  useEffect(() => {
+    let active = true;
+
+    async function requireAuthenticatedUser() {
+      const {
+        data: { user },
+        error,
+      } = await supabase.auth.getUser();
+
+      if (!active) return;
+
+      if (error || !user) {
+        router.replace("/login");
+        return;
+      }
+
+      setUserEmail(user.email ?? "Authenticated user");
+    }
+
+    void requireAuthenticatedUser();
+
+    return () => {
+      active = false;
+    };
+  }, [router]);
 
   async function handleContinue() {
     if (selectedOption === null || saving) return;
@@ -37,10 +67,22 @@ export default function QuizEngine({ quiz }: { quiz: Quiz }) {
       const score = calculateScore(quiz.questions, updatedAnswers);
       const totalMarks = calculateTotalMarks(quiz.questions);
       setSaving(true);
-      const message = await saveQuizAttempt({ quiz, answers: updatedAnswers, score, totalMarks });
-      setSaveMessage(message);
-      setSaving(false);
-      setFinished(true);
+      try {
+        const message = await saveQuizAttempt({
+          quiz,
+          answers: updatedAnswers,
+          score,
+          totalMarks,
+        });
+        setSaveMessage(message);
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : "Unknown persistence error.";
+        setSaveMessage("Could not save quiz results: " + message);
+      } finally {
+        setSaving(false);
+        setFinished(true);
+      }
       return;
     }
 
@@ -75,11 +117,19 @@ export default function QuizEngine({ quiz }: { quiz: Quiz }) {
     setSaveMessage("");
   }
 
+  if (!userEmail) {
+    return (
+      <main style={styles.page}>
+        <div style={styles.authLoading}>Checking sign-in...</div>
+      </main>
+    );
+  }
+
   if (finished) {
     return (
       <main style={styles.page}>
         <div style={styles.shell}>
-          <AppHeader />
+          <AppHeader userEmail={userEmail} />
           <ResultCard completionTitle={quiz.completionTitle} score={calculateScore(quiz.questions, answers)} totalMarks={calculateTotalMarks(quiz.questions)} saveMessage={saveMessage} onRestart={restartQuiz} />
         </div>
       </main>
@@ -89,7 +139,7 @@ export default function QuizEngine({ quiz }: { quiz: Quiz }) {
   return (
     <main style={styles.page}>
       <div style={styles.shell}>
-        <AppHeader practiceActive />
+        <AppHeader practiceActive userEmail={userEmail} />
         <section style={styles.content}>
           <div style={styles.topRow}>
             <div>
@@ -115,4 +165,11 @@ const styles: Record<string, React.CSSProperties> = {
   eyebrow: { margin: 0, fontSize: 12, fontWeight: 700, letterSpacing: "1.5px", color: "#888" },
   title: { margin: "7px 0 0", fontSize: 28, fontWeight: 600 },
   counter: { fontSize: 14, color: "#777" },
+  authLoading: {
+    minHeight: "100vh",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    color: "#666",
+  },
 };
