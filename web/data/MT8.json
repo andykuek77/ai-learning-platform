@@ -9,79 +9,107 @@
       "85",
       "87"
     ],
-    "marks": 2
+    "correctOption": 3,
+    "correctAnswer": "85",
+    "marks": 2,
+    "topic": "Whole Numbers",
+    "skill": "Consecutive number relationships"
   },
   {
     "id": 2,
     "type": "mcq",
-    "question": "A delivery van carries 9 boxes. Each box contains 8 packets, and each packet contains 6 markers. If\n27 markers are given away, how many markers remain?",
+    "question": "A delivery van carries 9 boxes. Each box contains 8 packets, and each packet contains 6 markers. If 27 markers are given away, how many markers remain?",
     "options": [
       "459",
       "378",
       "405",
       "432"
     ],
-    "marks": 2
+    "correctOption": 3,
+    "correctAnswer": "405",
+    "marks": 2,
+    "topic": "Whole Numbers",
+    "skill": "Multiplication and division in context"
   },
   {
     "id": 3,
     "type": "mcq",
-    "question": "Two parcels have a total mass of 8 kg 450 g. The heavier parcel is 1 kg 250 g heavier than the lighter\nparcel. If 750 g is removed from the heavier parcel, what is its new mass?",
+    "question": "Two parcels have a total mass of 8 kg 450 g. The heavier parcel is 1 kg 250 g heavier than the lighter parcel. If 750 g is removed from the heavier parcel, what is its new mass?",
     "options": [
       "3 kg 850 g",
       "4 kg 100 g",
       "4 kg 850 g",
       "5 kg 600 g"
     ],
-    "marks": 2
+    "correctOption": 2,
+    "correctAnswer": "4 kg 100 g",
+    "marks": 2,
+    "topic": "Measurement",
+    "skill": "Mass problems"
   },
   {
     "id": 4,
     "type": "mcq",
-    "question": "A square and a rectangle have the same perimeter. The square has side 14 cm. The rectangle is 18\ncm long. What is the breadth of the rectangle?",
+    "question": "A square and a rectangle have the same perimeter. The square has side 14 cm. The rectangle is 18 cm long. What is the breadth of the rectangle?",
     "options": [
       "20 cm",
       "10 cm",
       "8 cm",
       "12 cm"
     ],
-    "marks": 2
+    "correctOption": 2,
+    "correctAnswer": "10 cm",
+    "marks": 2,
+    "topic": "Geometry",
+    "skill": "Perimeter of rectangles and squares"
   },
   {
     "id": 5,
     "type": "mcq",
-    "question": "A train journey takes 2 h 45 min. The train arrives at 12.20 a.m. on Tuesday. At what time did it leave\non Monday?",
+    "question": "A train journey takes 2 h 45 min. The train arrives at 12.20 a.m. on Tuesday. At what time did it leave on Monday?",
     "options": [
       "9.35 p.m.",
       "8.35 p.m.",
       "10.35 p.m.",
       "9.25 p.m."
     ],
-    "marks": 2
+    "correctOption": 1,
+    "correctAnswer": "9.35 p.m.",
+    "marks": 2,
+    "topic": "Measurement",
+    "skill": "Time and duration"
   },
   {
     "id": 6,
     "type": "mcq",
-    "question": "Nora bought 4 identical notebooks and 1 pen. The pen cost $6. She paid with a $50 note and received\n$8 change. How much did each notebook cost?",
+    "question": "Nora bought 4 identical notebooks and 1 pen. The pen cost $6. She paid with a $50 note and received $8 change. How much did each notebook cost?",
     "options": [
       "$7",
       "$8",
       "$10",
       "$9"
     ],
-    "marks": 2
+    "correctOption": 4,
+    "correctAnswer": "$9",
+    "marks": 2,
+    "topic": "Measurement",
+    "skill": "Money calculations"
   },
   {
     "id": 7,
     "type": "mcq",
-    "question": "A box contains red, blue and green counters. 2/7 of the counters are red and 3/7 are blue. There are\n12 more blue counters than red counters. How many green counters are there?",
+    "question": "A box contains red, blue and green counters. 2/7 of the counters are red and 3/7 are blue. There are 12 more blue counters than red counters. How many green counters are there?",
     "options": [
       "24",
       "18",
       "30",
       "36"
     ],
-    "marks": 2
+    "correctOption": 1,
+    "correctAnswer": "24",
+    "marks": 2,
+    "topic": "Fractions",
+    "skill": "Fractions of a set"
   },
   {
     "id": 8,
@@ -93,7 +121,11 @@
       "27 cm",
       "16 cm"
     ],
-    "marks": 2
+    "correctOption": 4,
+    "correctAnswer": "16 cm",
+    "marks": 2,
+    "topic": "Geometry",
+    "skill": "Perimeter of rectangles and squares"
   },
   {
     "id": 9,
@@ -105,42 +137,58 @@
       "468",
       "465"
     ],
-    "marks": 2
+    "correctOption": 4,
+    "correctAnswer": "465",
+    "marks": 2,
+    "topic": "Patterns",
+    "skill": "Growing number patterns"
   },
   {
     "id": 10,
     "type": "mcq",
-    "question": "Cards are arranged repeatedly in this pattern: A, B, C, D, D, C, B, A. The pattern continues in the same\nway. How many B cards are there among the first 123 cards?",
+    "question": "Cards are arranged repeatedly in this pattern: A, B, C, D, D, C, B, A. The pattern continues in the same way. How many B cards are there among the first 123 cards?",
     "options": [
       "29",
       "31",
       "30",
       "32"
     ],
-    "marks": 2
+    "correctOption": 2,
+    "correctAnswer": "31",
+    "marks": 2,
+    "topic": "Patterns",
+    "skill": "Repeating patterns"
   },
   {
     "id": 11,
     "type": "mcq",
-    "question": "There are 28 children. 16 chose milk, 15 chose juice and 6 chose both. How many chose exactly one\nof the two drinks?",
+    "question": "There are 28 children. 16 chose milk, 15 chose juice and 6 chose both. How many chose exactly one of the two drinks?",
     "options": [
       "13",
       "25",
       "19",
       "31"
     ],
-    "marks": 2
+    "correctOption": 3,
+    "correctAnswer": "19",
+    "marks": 2,
+    "topic": "Data and Sets",
+    "skill": "Overlapping groups"
   },
   {
     "id": 12,
     "type": "mcq",
-    "question": "Maya had 96 more stickers than Noah. They each gave away 18 stickers. After that, Maya had 4 times\nas many stickers as Noah. How many stickers did Maya have at first?",
+    "question": "Maya had 96 more stickers than Noah. They each gave away 18 stickers. After that, Maya had 4 times as many stickers as Noah. How many stickers did Maya have at first?",
     "options": [
       "146",
       "128",
       "138",
       "164"
     ],
-    "marks": 2
+    "correctOption": 1,
+    "correctAnswer": "146",
+    "marks": 2,
+    "topic": "Whole Numbers",
+    "skill": "Comparison and change problems"
   }
 ]

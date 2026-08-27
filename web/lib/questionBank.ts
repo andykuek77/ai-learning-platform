@@ -1,5 +1,6 @@
 import mt7Questions from "@/data/MT7.json";
-import type { Question } from "@/types/quiz";
+import mt8Questions from "@/data/MT8.json";
+import type { Question, Quiz } from "@/types/quiz";
 
 type SourceQuestion = Omit<
   Question,
@@ -10,17 +11,32 @@ type SourceQuestion = Omit<
 
 type QuizSource = {
   id: string;
+  subject: string;
   title: string;
+  completionTitle: string;
   questions: SourceQuestion[];
 };
 
+export type RegisteredQuiz = Pick<Quiz, "id" | "subject" | "title"> & {
+  questionCount: number;
+};
+
 // Add a quiz here only after its answer key and classifications are complete
-// and verified. MT8 is intentionally excluded for now.
+// and verified.
 const verifiedQuizSources: QuizSource[] = [
   {
     id: "MT7",
+    subject: "MATHEMATICS",
     title: "Mock Test 7",
+    completionTitle: "Mathematics Mock Test 7",
     questions: mt7Questions,
+  },
+  {
+    id: "MT8",
+    subject: "MATHEMATICS",
+    title: "Mock Test 8",
+    completionTitle: "Mathematics Mock Test 8",
+    questions: mt8Questions,
   },
 ];
 
@@ -57,6 +73,28 @@ for (const source of verifiedQuizSources) {
 }
 
 export const questionBank: Question[] = Array.from(questionsByQuiz.values()).flat();
+
+export const registeredQuizzes: RegisteredQuiz[] = verifiedQuizSources.map(
+  (source) => ({
+    id: source.id,
+    subject: source.subject,
+    title: source.title,
+    questionCount: source.questions.length,
+  })
+);
+
+export function getQuiz(quizId: string): Quiz | undefined {
+  const source = verifiedQuizSources.find((quiz) => quiz.id === quizId);
+  if (!source) return undefined;
+
+  return {
+    id: source.id,
+    subject: source.subject,
+    title: source.title,
+    completionTitle: source.completionTitle,
+    questions: getQuizQuestions(source.id),
+  };
+}
 
 export function getQuizQuestions(quizId: string): Question[] {
   return questionsByQuiz.get(quizId) ?? [];
