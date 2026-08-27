@@ -1,5 +1,8 @@
 export type Question = {
-  id: number;
+  id: string;
+  sourceQuizId: string;
+  sourceQuizTitle: string;
+  sourceQuestionId: number;
   type: string;
   question: string;
   options: string[];
@@ -19,6 +22,6 @@ export type Quiz = {
   questions: Question[];
 };
 
-export type QuizAnswers = Record<number, number>;
+export type QuizAnswers = Record<string, number>;
 
 export type AnswerFeedback = "correct" | "incorrect" | null;

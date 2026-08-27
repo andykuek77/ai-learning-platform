@@ -1,6 +1,6 @@
 import Link from "next/link";
 import QuizEngine from "@/components/QuizEngine";
-import questions from "@/data/MT7.json";
+import { getQuestionsBySkill } from "@/lib/questionBank";
 import type { Quiz } from "@/types/quiz";
 
 type TargetedPracticePageProps = {
@@ -11,9 +11,7 @@ export default async function TargetedPracticePage({
   params,
 }: TargetedPracticePageProps) {
   const { skill } = await params;
-  const matchingQuestions = questions.filter(
-    (question) => question.skill?.trim() === skill.trim()
-  );
+  const matchingQuestions = getQuestionsBySkill(skill);
 
   if (matchingQuestions.length === 0) {
     return (
