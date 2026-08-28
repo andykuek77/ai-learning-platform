@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "content:import": "tsx scripts/import-content.ts",
-    "test": "tsx --test tests/contentImportToken.test.ts"
+    "test": "tsx --test tests/contentImportToken.test.ts tests/tutorEngine.test.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.112.4",
