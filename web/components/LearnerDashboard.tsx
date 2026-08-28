@@ -14,6 +14,7 @@ import {
   type QuestionAttemptForAnalytics,
 } from "@/lib/analytics";
 import { supabase } from "@/lib/supabase";
+import type { RegisteredCourse } from "@/lib/courseRegistry";
 import type { RegisteredQuiz } from "@/lib/questionBank";
 
 type QuizAttempt = {
@@ -30,8 +31,10 @@ type DashboardData = {
 };
 
 export default function LearnerDashboard({
+  courses,
   quizzes,
 }: {
+  courses: RegisteredCourse[];
   quizzes: RegisteredQuiz[];
 }) {
   const router = useRouter();
@@ -230,6 +233,24 @@ export default function LearnerDashboard({
               </div>
             </section>
 
+            <section style={styles.learnCard}>
+              <div>
+                <p style={styles.cardEyebrow}>LEARN</p>
+                <h2 style={styles.learnTitle}>
+                  {courses[0]?.title ?? "Explore lessons"}
+                </h2>
+                <p style={styles.learnText}>
+                  Read clear explanations and worked examples, then practise the same skill.
+                </p>
+              </div>
+              <Link
+                href={courses[0] ? `/learn/${courses[0].id}` : "/learn"}
+                style={styles.learnButton}
+              >
+                Explore lessons
+              </Link>
+            </section>
+
             <div style={styles.chartsGrid}>
               <TopicPerformanceChart topics={topicPerformance} />
               <RecentQuizPerformanceChart attempts={mockQuizPerformance} />
@@ -382,6 +403,10 @@ const styles: Record<string, React.CSSProperties> = {
   metricCard: { minHeight: 128, padding: 22, border: "1px solid #eceef1", borderRadius: 16, background: "#fff" },
   metricLabel: { margin: "0 0 16px", color: "#777", fontSize: 13 },
   metricValue: { margin: 0, fontSize: 20, fontWeight: 650, lineHeight: 1.35 },
+  learnCard: { display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 28, padding: 30, border: "1px solid #dfe5ff", borderRadius: 18, background: "#f2f5ff" },
+  learnTitle: { margin: "8px 0 0", fontSize: 21, fontWeight: 600 },
+  learnText: { maxWidth: 640, margin: "8px 0 0", color: "#5f6470", lineHeight: 1.55 },
+  learnButton: { display: "inline-block", flexShrink: 0, padding: "12px 18px", borderRadius: 10, background: "#536dfe", color: "#fff", textDecoration: "none", fontWeight: 700 },
   recommendationRow: { display: "flex", alignItems: "center", justifyContent: "space-between", gap: 28 },
   cardText: { margin: "8px 0 0", color: "#666", lineHeight: 1.55 },
   quizGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: 20 },

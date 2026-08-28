@@ -1,5 +1,6 @@
 import Link from "next/link";
 import QuizEngine from "@/components/QuizEngine";
+import { getSkill } from "@/lib/courseRegistry";
 import { getQuestionsBySkill } from "@/lib/questionBank";
 import type { Quiz } from "@/types/quiz";
 
@@ -10,7 +11,9 @@ type TargetedPracticePageProps = {
 export default async function TargetedPracticePage({
   params,
 }: TargetedPracticePageProps) {
-  const { skill } = await params;
+  const { skill: skillParam } = await params;
+  const decodedSkill = decodeSkillParam(skillParam);
+  const skill = getSkill(decodedSkill)?.label ?? decodedSkill;
   const matchingQuestions = getQuestionsBySkill(skill);
 
   if (matchingQuestions.length === 0) {
@@ -44,6 +47,14 @@ export default async function TargetedPracticePage({
       : undefined;
 
   return <QuizEngine quiz={quiz} notice={notice} />;
+}
+
+function decodeSkillParam(skillParam: string) {
+  try {
+    return decodeURIComponent(skillParam).trim();
+  } catch {
+    return skillParam.trim();
+  }
 }
 
 const styles: Record<string, React.CSSProperties> = {
