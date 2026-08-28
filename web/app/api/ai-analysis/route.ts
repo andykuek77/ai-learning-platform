@@ -56,6 +56,13 @@ export async function POST(request: Request) {
     error: userError,
   } = await supabase.auth.getUser(accessToken);
 
+  if (userError?.status === 0) {
+    return Response.json(
+      { error: "Could not verify your session with Supabase. Please try again." },
+      { status: 503 }
+    );
+  }
+
   if (userError || !user) {
     return Response.json(
       { error: "Your session is no longer valid. Please log in again." },

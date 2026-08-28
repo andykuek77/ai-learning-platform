@@ -71,19 +71,7 @@ export default function ProgressPage() {
         setAiLoading(true);
 
         try {
-          const {
-            data: { session },
-            error: sessionError,
-          } = await supabase.auth.getSession();
-
-          if (!session || sessionError) {
-            throw new Error("Your session is no longer valid. Please log in again.");
-          }
-
-          const response = await fetch("/api/ai-analysis", {
-            method: "POST",
-            headers: { Authorization: `Bearer ${session.access_token}` },
-          });
+          const response = await fetchAiAnalysis();
           const result = (await response.json()) as AiLearningAnalysis & {
             error?: string;
           };
@@ -157,6 +145,58 @@ export default function ProgressPage() {
       </section>
     </main>
   );
+}
+
+async function fetchAiAnalysis() {
+  const accessToken = await getCurrentAccessToken();
+  let response = await requestAiAnalysis(accessToken);
+
+  if (response.status === 401) {
+    const refreshedToken = await getCurrentAccessToken(true);
+    response = await requestAiAnalysis(refreshedToken);
+  }
+
+  return response;
+}
+
+async function getCurrentAccessToken(forceRefresh = false): Promise<string> {
+  if (forceRefresh) {
+    const {
+      data: { session },
+      error,
+    } = await supabase.auth.refreshSession();
+
+    if (error || !session) {
+      throw new Error("Your session could not be refreshed. Please log in again.");
+    }
+
+    return session.access_token;
+  }
+
+  const {
+    data: { session },
+    error,
+  } = await supabase.auth.getSession();
+
+  if (error || !session) {
+    throw new Error("Your session is no longer valid. Please log in again.");
+  }
+
+  const expiresAtMilliseconds = (session.expires_at ?? 0) * 1000;
+  const refreshMarginMilliseconds = 60_000;
+
+  if (expiresAtMilliseconds <= Date.now() + refreshMarginMilliseconds) {
+    return getCurrentAccessToken(true);
+  }
+
+  return session.access_token;
+}
+
+function requestAiAnalysis(accessToken: string) {
+  return fetch("/api/ai-analysis", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
 }
 
 function RecommendedPractice({ skills }: { skills: MasteryArea[] }) {

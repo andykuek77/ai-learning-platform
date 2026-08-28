@@ -4,6 +4,10 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import AppHeader from "@/components/AppHeader";
+import RecentQuizPerformanceChart, {
+  type QuizPerformancePoint,
+} from "@/components/charts/RecentQuizPerformanceChart";
+import TopicPerformanceChart from "@/components/charts/TopicPerformanceChart";
 import {
   calculateMastery,
   getCategorizedSkillExtremes,
@@ -21,6 +25,7 @@ type QuizAttempt = {
 
 type DashboardData = {
   quizAttempts: QuizAttempt[];
+  mockQuizAttempts: QuizAttempt[];
   questionAttempts: QuestionAttemptForAnalytics[];
 };
 
@@ -56,13 +61,25 @@ export default function LearnerDashboard({
         authenticated = true;
         setUserEmail(user.email ?? "Authenticated user");
 
-        const [quizResult, questionResult] = await Promise.all([
+        const registeredQuizIds = quizzes.map((quiz) => quiz.id);
+        const mockQuizRequest = registeredQuizIds.length > 0
+          ? supabase
+              .from("quiz_attempts")
+              .select("quiz_name, score, total_marks, created_at")
+              .eq("user_id", user.id)
+              .in("quiz_name", registeredQuizIds)
+              .order("created_at", { ascending: false, nullsFirst: false })
+              .limit(8)
+          : Promise.resolve({ data: [] as QuizAttempt[], error: null });
+
+        const [quizResult, mockQuizResult, questionResult] = await Promise.all([
           supabase
             .from("quiz_attempts")
             .select("quiz_name, score, total_marks, created_at")
             .eq("user_id", user.id)
             .order("created_at", { ascending: false, nullsFirst: false })
             .limit(6),
+          mockQuizRequest,
           supabase
             .from("question_attempts")
             .select("topic, skill, is_correct")
@@ -71,13 +88,18 @@ export default function LearnerDashboard({
 
         if (!active) return;
 
-        const errors = [quizResult.error, questionResult.error].filter(Boolean);
+        const errors = [
+          quizResult.error,
+          mockQuizResult.error,
+          questionResult.error,
+        ].filter(Boolean);
         if (errors.length > 0) {
           setErrorMessage("Some learning activity could not be loaded. Please refresh to try again.");
         }
 
         setDashboard({
           quizAttempts: (quizResult.data ?? []) as QuizAttempt[],
+          mockQuizAttempts: (mockQuizResult.data ?? []) as QuizAttempt[],
           questionAttempts: (questionResult.data ?? []) as QuestionAttemptForAnalytics[],
         });
       } catch {
@@ -87,7 +109,7 @@ export default function LearnerDashboard({
           return;
         }
         setErrorMessage("Learning activity could not be loaded. Please refresh to try again.");
-        setDashboard({ quizAttempts: [], questionAttempts: [] });
+        setDashboard({ quizAttempts: [], mockQuizAttempts: [], questionAttempts: [] });
       }
     }
 
@@ -96,12 +118,42 @@ export default function LearnerDashboard({
     return () => {
       active = false;
     };
-  }, [router]);
+  }, [quizzes, router]);
 
   const skillSummary = useMemo(() => {
     const skills = calculateMastery(dashboard?.questionAttempts ?? [], "skill");
     return getCategorizedSkillExtremes(skills);
   }, [dashboard]);
+
+  const topicPerformance = useMemo(() => {
+    return calculateMastery(dashboard?.questionAttempts ?? [], "topic").filter(
+      (topic) => topic.name !== "Uncategorised"
+    );
+  }, [dashboard]);
+
+  const mockQuizPerformance = useMemo<QuizPerformancePoint[]>(() => {
+    const attemptNumbers = new Map<string, number>();
+
+    return [...(dashboard?.mockQuizAttempts ?? [])]
+      .reverse()
+      .flatMap((attempt, index) => {
+        const quiz = quizzes.find((registered) => registered.id === attempt.quiz_name);
+        if (!quiz || attempt.total_marks <= 0) return [];
+
+        const attemptNumber = (attemptNumbers.get(quiz.id) ?? 0) + 1;
+        attemptNumbers.set(quiz.id, attemptNumber);
+
+        return [{
+          id: `${attempt.quiz_name}-${attempt.created_at ?? index}`,
+          quizTitle: quiz.title,
+          axisLabel: `${quiz.id} #${attemptNumber}`,
+          dateLabel: formatAttemptDateTime(attempt.created_at),
+          score: attempt.score,
+          totalMarks: attempt.total_marks,
+          accuracy: Math.round((attempt.score / attempt.total_marks) * 100),
+        }];
+      });
+  }, [dashboard, quizzes]);
 
   if (!userEmail) {
     return (
@@ -177,6 +229,11 @@ export default function LearnerDashboard({
                 <MetricCard label="Weakest skill" value={skillSummary.weakest ? `${skillSummary.weakest.name} · ${skillSummary.weakest.accuracy}%` : "Not yet available"} />
               </div>
             </section>
+
+            <div style={styles.chartsGrid}>
+              <TopicPerformanceChart topics={topicPerformance} />
+              <RecentQuizPerformanceChart attempts={mockQuizPerformance} />
+            </div>
 
             <section style={styles.card}>
               <p style={styles.cardEyebrow}>RECOMMENDED PRACTICE</p>
@@ -289,6 +346,16 @@ function formatAttemptDate(value: string | null) {
   return new Intl.DateTimeFormat(undefined, { dateStyle: "medium" }).format(date);
 }
 
+function formatAttemptDateTime(value: string | null) {
+  if (!value) return "Date and time unavailable";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Date and time unavailable";
+  return new Intl.DateTimeFormat(undefined, {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(date);
+}
+
 const styles: Record<string, React.CSSProperties> = {
   page: { minHeight: "100vh", background: "#f7f8fa", color: "#202124", fontFamily: "Arial, Helvetica, sans-serif" },
   loading: { minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", color: "#666" },
@@ -311,6 +378,7 @@ const styles: Record<string, React.CSSProperties> = {
   sectionTitle: { margin: 0, fontSize: 21, fontWeight: 600 },
   sectionSubtitle: { margin: "6px 0 0", color: "#777", lineHeight: 1.5 },
   summaryGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))", gap: 16 },
+  chartsGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 420px), 1fr))", gap: 20, alignItems: "start" },
   metricCard: { minHeight: 128, padding: 22, border: "1px solid #eceef1", borderRadius: 16, background: "#fff" },
   metricLabel: { margin: "0 0 16px", color: "#777", fontSize: 13 },
   metricValue: { margin: 0, fontSize: 20, fontWeight: 650, lineHeight: 1.35 },
