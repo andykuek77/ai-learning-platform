@@ -1,9 +1,28 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
 import { useRouter } from "next/navigation";
 import AppHeader from "@/components/AppHeader";
+import { createHybridContentRepository } from "@/lib/contentRepository";
 import { supabase } from "@/lib/supabase";
+import type { ContentRepository, ContentRepositoryDiagnostic } from "@/types/contentRepository";
+
+const LearningContentContext = createContext<ContentRepository | null>(null);
+
+export function useLearningContentRepository() {
+  const repository = useContext(LearningContentContext);
+  if (!repository) {
+    throw new Error("Learning content must be used inside AuthenticatedLearningShell");
+  }
+  return repository;
+}
 
 export default function AuthenticatedLearningShell({
   children,
@@ -12,6 +31,10 @@ export default function AuthenticatedLearningShell({
 }) {
   const router = useRouter();
   const [userEmail, setUserEmail] = useState<string | null>(null);
+  const repository = useMemo(
+    () => createHybridContentRepository(supabase, { onDiagnostic: reportContentDiagnostic }),
+    []
+  );
 
   useEffect(() => {
     let active = true;
@@ -48,9 +71,24 @@ export default function AuthenticatedLearningShell({
   return (
     <main style={styles.page}>
       <AppHeader activeSection="learn" userEmail={userEmail} />
-      {children}
+      <LearningContentContext.Provider value={repository}>
+        {children}
+      </LearningContentContext.Provider>
     </main>
   );
+}
+
+function reportContentDiagnostic(diagnostic: ContentRepositoryDiagnostic) {
+  if (process.env.NODE_ENV !== "development") return;
+  try {
+    console.info("[LearnAI content repository]", diagnostic);
+    window.sessionStorage.setItem(
+      "learnai:last-content-source",
+      JSON.stringify(diagnostic)
+    );
+  } catch {
+    // Storage and console diagnostics are never part of application behavior.
+  }
 }
 
 const styles: Record<string, React.CSSProperties> = {

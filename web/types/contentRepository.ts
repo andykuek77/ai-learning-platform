@@ -19,3 +19,13 @@ export interface ContentRepository {
   ): Promise<PublishedLesson | undefined>;
 }
 
+export type ContentRepositoryDiagnostic = {
+  operation: "courses" | "course" | "lesson";
+  outcome:
+    | "database"
+    | "fallback_empty"
+    | "fallback_temporary_failure"
+    | "invalid_content";
+  courseId?: string;
+  lessonId?: string;
+};

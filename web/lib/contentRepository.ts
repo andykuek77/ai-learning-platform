@@ -6,7 +6,11 @@ import {
   getTopic,
   registeredCourses,
 } from "@/lib/courseRegistry";
-import type { ContentRepository, PublishedLesson } from "@/types/contentRepository";
+import type {
+  ContentRepository,
+  ContentRepositoryDiagnostic,
+  PublishedLesson,
+} from "@/types/contentRepository";
 import type { Course, CourseModule, Lesson, LessonExplanationSection, WorkedExample } from "@/types/course";
 import type { ContentOrigin, ContentStatus, CurriculumLevelKind, LessonDifficulty } from "@/types/curriculum";
 
@@ -92,6 +96,20 @@ export function createSupabaseContentRepository(
   };
 }
 
+export class ContentDatabaseError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "ContentDatabaseError";
+  }
+}
+
+export class InvalidContentError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "InvalidContentError";
+  }
+}
+
 export const staticContentRepository: ContentRepository = {
   async getPublishedCourses() {
     return registeredCourses.flatMap((registered) => {
@@ -110,17 +128,36 @@ export const staticContentRepository: ContentRepository = {
 };
 
 export function createHybridContentRepository(
-  supabase: SupabaseClient
+  supabase: SupabaseClient,
+  options: {
+    onDiagnostic?: (diagnostic: ContentRepositoryDiagnostic) => void;
+  } = {}
 ): ContentRepository {
   const database = createSupabaseContentRepository(supabase);
+  const report = (diagnostic: ContentRepositoryDiagnostic) => {
+    try {
+      options.onDiagnostic?.(diagnostic);
+    } catch {
+      // Diagnostics are observability-only and must never affect content flow.
+    }
+  };
 
   return {
     async getPublishedCourses() {
       const fallbackCourses = await staticContentRepository.getPublishedCourses();
       try {
         const databaseCourses = await database.getPublishedCourses();
+        report({
+          operation: "courses",
+          outcome: databaseCourses.length > 0 ? "database" : "fallback_empty",
+        });
         return mergeCourses(databaseCourses, fallbackCourses);
-      } catch {
+      } catch (error) {
+        if (error instanceof InvalidContentError) {
+          report({ operation: "courses", outcome: "invalid_content" });
+          throw error;
+        }
+        report({ operation: "courses", outcome: "fallback_temporary_failure" });
         return fallbackCourses;
       }
     },
@@ -128,9 +165,20 @@ export function createHybridContentRepository(
     async getPublishedCourse(courseId) {
       try {
         const course = await database.getPublishedCourse(courseId);
-        if (course) return course;
-      } catch {
-        // The fallback keeps learning available before the migration is applied.
+        if (course) {
+          report({ operation: "course", outcome: "database", courseId });
+          return course;
+        }
+        report({ operation: "course", outcome: "fallback_empty", courseId });
+      } catch (error) {
+        if (error instanceof InvalidContentError) {
+          report({ operation: "course", outcome: "invalid_content", courseId });
+          throw error;
+        }
+        const fallback = await staticContentRepository.getPublishedCourse(courseId);
+        report({ operation: "course", outcome: "fallback_temporary_failure", courseId });
+        if (fallback) return fallback;
+        throw error;
       }
       return staticContentRepository.getPublishedCourse(courseId);
     },
@@ -138,9 +186,20 @@ export function createHybridContentRepository(
     async getPublishedLesson(courseId, lessonId) {
       try {
         const lesson = await database.getPublishedLesson(courseId, lessonId);
-        if (lesson) return lesson;
-      } catch {
-        // The fallback keeps learning available before the migration is applied.
+        if (lesson) {
+          report({ operation: "lesson", outcome: "database", courseId, lessonId });
+          return lesson;
+        }
+        report({ operation: "lesson", outcome: "fallback_empty", courseId, lessonId });
+      } catch (error) {
+        if (error instanceof InvalidContentError) {
+          report({ operation: "lesson", outcome: "invalid_content", courseId, lessonId });
+          throw error;
+        }
+        const fallback = await staticContentRepository.getPublishedLesson(courseId, lessonId);
+        report({ operation: "lesson", outcome: "fallback_temporary_failure", courseId, lessonId });
+        if (fallback) return fallback;
+        throw error;
       }
       return staticContentRepository.getPublishedLesson(courseId, lessonId);
     },
@@ -165,13 +224,19 @@ async function loadCourses(supabase: SupabaseClient, courseId?: string) {
   ]);
 
   const error = courseResult.error ?? moduleResult.error ?? lessonResult.error;
-  if (error) throw new Error(`Could not load published curriculum: ${error.message}`);
+  if (error) throw new ContentDatabaseError(`Could not load published curriculum: ${error.message}`);
 
   const courseRows = (courseResult.data ?? []) as CourseRow[];
   const moduleRows = (moduleResult.data ?? []) as ModuleRow[];
   const lessonRows = (lessonResult.data ?? []) as LessonRow[];
 
-  return courseRows.map((row) => convertCourse(row, moduleRows, lessonRows));
+  try {
+    return courseRows.map((row) => convertCourse(row, moduleRows, lessonRows));
+  } catch (error) {
+    if (error instanceof InvalidContentError) throw error;
+    const message = error instanceof Error ? error.message : "Unknown content validation error";
+    throw new InvalidContentError(message);
+  }
 }
 
 function convertCourse(
@@ -180,7 +245,7 @@ function convertCourse(
   lessonRows: LessonRow[]
 ): Course {
   const status = parseStatus(row.status);
-  if (status !== "published") throw new Error(`Course ${row.id} is not published`);
+  if (status !== "published") throw new InvalidContentError(`Course ${row.id} is not published`);
 
   return {
     id: row.id,
@@ -230,7 +295,7 @@ function convertLesson(row: LessonRow): Lesson {
   const skill = getSkill(row.skill_id);
   const practiceSkill = getSkill(row.targeted_practice_skill_id);
   if (!topic || !skill || !practiceSkill || skill.topicId !== topic.id) {
-    throw new Error(`Lesson ${row.course_id}/${row.id} has invalid canonical taxonomy IDs`);
+    throw new InvalidContentError(`Lesson ${row.course_id}/${row.id} has invalid canonical taxonomy IDs`);
   }
 
   return {
@@ -289,38 +354,38 @@ function convertProvenance(row: CourseRow | ModuleRow) {
 
 function parseStatus(value: string): ContentStatus {
   if (["draft", "reviewed", "approved", "published"].includes(value)) return value as ContentStatus;
-  throw new Error(`Invalid content status: ${value}`);
+  throw new InvalidContentError(`Invalid content status: ${value}`);
 }
 
 function parseOrigin(value: string): ContentOrigin {
   if (["original", "adapted", "licensed", "commissioned"].includes(value)) return value as ContentOrigin;
-  throw new Error(`Invalid content origin: ${value}`);
+  throw new InvalidContentError(`Invalid content origin: ${value}`);
 }
 
 function parseLevelKind(value: string): CurriculumLevelKind {
   if (["primary", "secondary", "programme", "open"].includes(value)) return value as CurriculumLevelKind;
-  throw new Error(`Invalid curriculum level kind: ${value}`);
+  throw new InvalidContentError(`Invalid curriculum level kind: ${value}`);
 }
 
 function parseDifficulty(value: string): LessonDifficulty {
   if (["foundation", "standard", "advanced", "challenge"].includes(value)) return value as LessonDifficulty;
-  throw new Error(`Invalid lesson difficulty: ${value}`);
+  throw new InvalidContentError(`Invalid lesson difficulty: ${value}`);
 }
 
 function requireSkill(skillId: string, lessonId: string) {
   const skill = getSkill(skillId);
-  if (!skill) throw new Error(`Lesson ${lessonId} has unknown practice skill ${skillId}`);
+  if (!skill) throw new InvalidContentError(`Lesson ${lessonId} has unknown practice skill ${skillId}`);
   return skill.id;
 }
 
 function parseStringArray(value: unknown, field: string, id: string): string[] {
   if (Array.isArray(value) && value.every((item) => typeof item === "string")) return value;
-  throw new Error(`Invalid ${field} on content ${id}`);
+  throw new InvalidContentError(`Invalid ${field} on content ${id}`);
 }
 
 function parseExplanationSections(value: unknown, lessonId: string): LessonExplanationSection[] {
   if (!Array.isArray(value) || !value.every(isExplanationSection)) {
-    throw new Error(`Invalid explanation sections on lesson ${lessonId}`);
+    throw new InvalidContentError(`Invalid explanation sections on lesson ${lessonId}`);
   }
   return value;
 }
@@ -334,7 +399,7 @@ function isExplanationSection(value: unknown): value is LessonExplanationSection
 
 function parseWorkedExamples(value: unknown, lessonId: string): WorkedExample[] {
   if (!Array.isArray(value) || !value.every(isWorkedExample)) {
-    throw new Error(`Invalid worked examples on lesson ${lessonId}`);
+    throw new InvalidContentError(`Invalid worked examples on lesson ${lessonId}`);
   }
   return value;
 }
