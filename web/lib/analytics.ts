@@ -13,6 +13,11 @@ export type MasteryArea = {
 
 type MasteryDimension = "topic" | "skill";
 
+export type CategorizedSkillExtremes = {
+  strongest: MasteryArea | null;
+  weakest: MasteryArea | null;
+};
+
 export function calculateMastery(
   attempts: QuestionAttemptForAnalytics[],
   dimension: MasteryDimension
@@ -40,4 +45,30 @@ export function calculateMastery(
       first.name.localeCompare(second.name)
     );
   });
+}
+
+export function getCategorizedSkillExtremes(
+  skills: MasteryArea[]
+): CategorizedSkillExtremes {
+  const categorized = skills.filter(
+    (skill) => skill.attempted > 0 && skill.name !== "Uncategorised"
+  );
+
+  const weakest = [...categorized].sort((first, second) => {
+    return (
+      first.accuracy - second.accuracy ||
+      second.attempted - first.attempted ||
+      first.name.localeCompare(second.name)
+    );
+  })[0] ?? null;
+
+  const strongest = [...categorized].sort((first, second) => {
+    return (
+      second.accuracy - first.accuracy ||
+      second.attempted - first.attempted ||
+      first.name.localeCompare(second.name)
+    );
+  })[0] ?? null;
+
+  return { strongest, weakest };
 }

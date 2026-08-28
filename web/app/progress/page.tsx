@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import AppHeader from "@/components/AppHeader";
 import {
   calculateMastery,
+  getCategorizedSkillExtremes,
   type MasteryArea,
   type QuestionAttemptForAnalytics,
 } from "@/lib/analytics";
@@ -159,9 +160,7 @@ export default function ProgressPage() {
 }
 
 function RecommendedPractice({ skills }: { skills: MasteryArea[] }) {
-  const weakestSkill = skills.find(
-    (skill) => skill.attempted > 0 && skill.name !== "Uncategorised"
-  );
+  const { weakest: weakestSkill } = getCategorizedSkillExtremes(skills);
 
   return (
     <section style={styles.card}>

@@ -1,6 +1,6 @@
-import PracticeHome from "@/components/PracticeHome";
+import LearnerDashboard from "@/components/LearnerDashboard";
 import { registeredQuizzes } from "@/lib/questionBank";
 
 export default function Home() {
-  return <PracticeHome quizzes={registeredQuizzes} />;
+  return <LearnerDashboard quizzes={registeredQuizzes} />;
 }

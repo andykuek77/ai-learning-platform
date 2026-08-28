@@ -20,7 +20,7 @@ export default function AppHeader({
             ...(activeSection === "practice" ? styles.activeNav : {}),
           }}
         >
-          Practice
+          Dashboard
         </Link>
         <Link
           href="/progress"
