@@ -6,6 +6,7 @@ import {
 } from "@/lib/analytics";
 import type {
   AiLearningAnalysis,
+  AiLearningAnalysisResponse,
   LearnerAnalytics,
 } from "@/types/aiAnalysis";
 
@@ -64,8 +65,9 @@ export async function POST(request: Request) {
 
   const { data, error: attemptsError } = await supabase
     .from("question_attempts")
-    .select("topic, skill, is_correct")
-    .eq("user_id", user.id);
+    .select("topic, skill, is_correct, created_at")
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false, nullsFirst: false });
 
   if (attemptsError) {
     return Response.json(
@@ -74,13 +76,49 @@ export async function POST(request: Request) {
     );
   }
 
-  const attempts = (data ?? []) as QuestionAttemptForAnalytics[];
+  const attempts = (data ?? []) as Array<
+    QuestionAttemptForAnalytics & { created_at: string }
+  >;
 
   if (attempts.length === 0) {
     return Response.json(
       { error: "Complete a quiz before requesting an AI analysis." },
       { status: 400 }
     );
+  }
+
+  const latestAttemptAt = attempts[0]?.created_at;
+
+  if (!latestAttemptAt || Number.isNaN(Date.parse(latestAttemptAt))) {
+    return Response.json(
+      { error: "Learner attempt timestamps are unavailable." },
+      { status: 500 }
+    );
+  }
+
+  const { data: cachedRow, error: cacheError } = await supabase
+    .from("ai_analyses")
+    .select("analysis_json")
+    .eq("user_id", user.id)
+    .eq("based_on_latest_attempt_at", latestAttemptAt)
+    .maybeSingle();
+
+  if (cacheError) {
+    return Response.json(
+      { error: "Could not check the saved AI analysis." },
+      { status: 500 }
+    );
+  }
+
+  if (cachedRow) {
+    if (!isAiLearningAnalysis(cachedRow.analysis_json)) {
+      return Response.json(
+        { error: "The saved AI analysis has an unexpected format." },
+        { status: 500 }
+      );
+    }
+
+    return analysisResponse(cachedRow.analysis_json, "cache");
   }
 
   const analytics: LearnerAnalytics = {
@@ -96,6 +134,8 @@ export async function POST(request: Request) {
       { status: 503 }
     );
   }
+
+  let analysis: AiLearningAnalysis;
 
   try {
     const openai = new OpenAI({ apiKey });
@@ -116,22 +156,61 @@ export async function POST(request: Request) {
       },
     });
 
-    const analysis: unknown = JSON.parse(response.output_text);
+    const parsedAnalysis: unknown = JSON.parse(response.output_text);
 
-    if (!isAiLearningAnalysis(analysis)) {
+    if (!isAiLearningAnalysis(parsedAnalysis)) {
       return Response.json(
         { error: "AI analysis returned an unexpected response." },
         { status: 502 }
       );
     }
 
-    return Response.json(analysis);
+    analysis = parsedAnalysis;
   } catch {
     return Response.json(
       { error: "AI learning analysis is temporarily unavailable." },
       { status: 502 }
     );
   }
+
+  const { error: saveError } = await supabase.from("ai_analyses").insert({
+    user_id: user.id,
+    analysis_json: analysis,
+    based_on_latest_attempt_at: latestAttemptAt,
+  });
+
+  if (saveError) {
+    if (saveError.code === "23505") {
+      const { data: concurrentRow, error: concurrentError } = await supabase
+        .from("ai_analyses")
+        .select("analysis_json")
+        .eq("user_id", user.id)
+        .eq("based_on_latest_attempt_at", latestAttemptAt)
+        .maybeSingle();
+
+      if (
+        !concurrentError &&
+        isAiLearningAnalysis(concurrentRow?.analysis_json)
+      ) {
+        return analysisResponse(concurrentRow.analysis_json, "cache");
+      }
+    }
+
+    return Response.json(
+      { error: "AI analysis was generated but could not be saved." },
+      { status: 500 }
+    );
+  }
+
+  return analysisResponse(analysis, "fresh");
+}
+
+function analysisResponse(
+  analysis: AiLearningAnalysis,
+  source: AiLearningAnalysisResponse["source"]
+) {
+  const response: AiLearningAnalysisResponse = { ...analysis, source };
+  return Response.json(response);
 }
 
 function getBearerToken(request: Request) {

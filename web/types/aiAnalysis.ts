@@ -11,3 +11,7 @@ export type AiLearningAnalysis = {
   areasToImprove: string[];
   recommendedNextSteps: string[];
 };
+
+export type AiLearningAnalysisResponse = AiLearningAnalysis & {
+  source: "cache" | "fresh";
+};
